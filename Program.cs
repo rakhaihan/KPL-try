@@ -6,6 +6,7 @@ using Tubes_Tahap1_KPL_kelompok3.table_driven;
 using Tubes_Tahap1_KPL_kelompok3.Automata;
 using Tubes_Tahap1_KPL_kelompok3.Utils;
 using Tubes_Tahap1_KPL_kelompok3.Components;
+using Tubes_Tahap1_KPL_kelompok3.Configuration;
 
 namespace Tubes_Tahap1_KPL_kelompok3
 {
@@ -13,6 +14,10 @@ namespace Tubes_Tahap1_KPL_kelompok3
     {
         static void Main(string[] args)
         {
+            // Memuat konfigurasi
+            var configManager = new ConfigManager();
+            var config = configManager.Config;
+
             var siswaService = new SiswaService();
             var pelanggaranService = new PelanggaranService();
             bool running = true;
@@ -39,7 +44,7 @@ namespace Tubes_Tahap1_KPL_kelompok3
                         TampilkanSemuaSiswa(siswaService);
                         break;
                     case "3":
-                        TambahPelanggaran(siswaService, pelanggaranService);
+                        TambahPelanggaran(siswaService, pelanggaranService, config);
                         break;
                     case "4":
                         LihatPelanggaranSiswa(siswaService);
@@ -94,7 +99,7 @@ namespace Tubes_Tahap1_KPL_kelompok3
             TableRenderer.Render(siswaList, columns);
         }
 
-        static void TambahPelanggaran(SiswaService siswaService, PelanggaranService pelanggaranService)
+        static void TambahPelanggaran(SiswaService siswaService, PelanggaranService pelanggaranService, AppConfig config)
         {
             Console.Write("Masukkan ID siswa: ");
             int id = int.Parse(Console.ReadLine());
@@ -127,6 +132,15 @@ namespace Tubes_Tahap1_KPL_kelompok3
                 };
 
                 pelanggaranService.TambahPelanggaran(siswa, pelanggaran);
+
+                // Menggunakan konfigurasi batas poin untuk menentukan sanksi
+                if (siswa.TotalPoin >= config.BatasPoinSkorsing)
+                    Console.WriteLine("[NOTIF] Siswa diberikan sanksi: Skorsing");
+                else if (siswa.TotalPoin >= config.BatasPoinPanggilanOrangTua)
+                    Console.WriteLine("[NOTIF] Siswa harus dipanggil orang tua.");
+                else if (siswa.TotalPoin >= config.BatasPoinPeringatan)
+                    Console.WriteLine("[NOTIF] Siswa mendapat peringatan.");
+
                 Console.WriteLine("Pelanggaran berhasil ditambahkan.");
             }
             catch (Exception ex)
@@ -211,5 +225,6 @@ namespace Tubes_Tahap1_KPL_kelompok3
                 Console.WriteLine($"Status pelanggaran '{siswa.RiwayatPelanggaran[index].Jenis}' berubah menjadi {siswa.RiwayatPelanggaran[index].Status}.");
             }
         }
+
     }
 }
