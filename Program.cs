@@ -14,7 +14,6 @@ namespace Tubes_Tahap1_KPL_kelompok3
     {
         static void Main(string[] args)
         {
-            // Memuat konfigurasi
             var configManager = new ConfigManager();
             var config = configManager.Config;
 
